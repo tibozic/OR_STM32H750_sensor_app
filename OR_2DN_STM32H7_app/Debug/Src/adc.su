@@ -1,0 +1,6 @@
+../Src/adc.c:59:6:pf8_adc_init	4	static
+../Src/adc.c:124:6:pf8_adc_deinit	4	static
+../Src/adc.c:137:6:adc_calibrate	16	static
+../Src/adc.c:182:6:start_single_conversion	4	static
+../Src/adc.c:191:6:start_continuous_conversion	4	static
+../Src/adc.c:200:10:adc_read	16	static
