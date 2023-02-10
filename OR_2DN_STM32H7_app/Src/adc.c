@@ -63,8 +63,8 @@ void pf8_adc_init(void)
 	RCC->AHB4ENR |= ADC3EN;
 
 	// Configure the ADC independent clock
-	ADC3_COMMON->CCR |=  (1u << 16);
-	ADC3_COMMON->CCR &= ~(1u << 17);
+	ADC3_COMMON->CCR |=  (1u << 17);
+	ADC3_COMMON->CCR &= ~(1u << 16);
 
 	/***** Enabling the ADC *****/
 	// Exit ADC deep-power-down mode (DEEPPWD=0)
