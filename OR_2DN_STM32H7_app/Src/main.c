@@ -62,9 +62,8 @@ int main(void)
 
 		printf("Light level: %d (%2.2f%%)\n\r", (int) sensor_val, light_percentage);
 
-		if( sensor_val < 3000 ) {
+		if( sensor_val < 2500 ) {
 			// very little light has been detected
-
 			// turn on the lights
 			GPIOK->BSRR = (1u << 1);
 		}
@@ -81,7 +80,7 @@ int main(void)
 	systick_terminate();
 }
 
-static void exti_callback(void)
+static void exti_water_detected(void)
 {
 	// while water is deteced
 	printf("WATER DETECTED\n\r");
@@ -107,6 +106,6 @@ void EXTI9_5_IRQHandler(void)
 		EXTI->PR1 |= LINE8;
 
 		// Do something
-		exti_callback();
+		exti_water_detected();
 	}
 }
