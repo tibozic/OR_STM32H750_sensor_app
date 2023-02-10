@@ -4,6 +4,7 @@
 #include "systick.h"
 #include "adc.h"
 #include "fpu.h"
+#include "exti.h"
 
 // Water sensor: 		D7 -> PI8
 // Light sensor:		A1 -> PF8
@@ -24,22 +25,17 @@
 #define LIGHT_SENS_PIN	PIN8
 #define WATER_SENS_PIN	PIN8
 
-#define BSRR_OFFSET		(16u)
 
 int main(void)
 {
 	fpu_enable();
 
-	// connect clock to PD, PI, PK
-	RCC->AHB4ENR |= (GPIOEEN | GPIOIEN | GPIOKEN);
+	// connect clock to PD, PK
+	RCC->AHB4ENR |= (GPIOEEN | GPIOKEN);
 
 	// set PE3 (external water LED) to output mode (01)
 	GPIOE->MODER |=  (1u << 6);
 	GPIOE->MODER &= ~(1u << 7);
-
-	// set PI8 (water sensor) as input (00)
-	GPIOI->MODER &= ~(1u << 16);
-	GPIOI->MODER &= ~(1u << 17);
 
 	// set PK1 (external light LED) to output mode (01)
 	GPIOK->MODER |=  (1u << 2);
@@ -48,11 +44,13 @@ int main(void)
 	uart3_tx_init();
 	systick_init();
 	pf8_adc_init();
+	pi8_exti_init();
 
 	// Start temperature conversion
 	start_continuous_conversion();
 
 	uint32_t sensor_val;
+	double light_percentage;
 
 	while(1)
 	{
@@ -60,9 +58,9 @@ int main(void)
 		// start_single_conversion();
 		sensor_val = adc_read();
 
-		// Check if water sensor has detected anything
-		char water = (GPIOI->IDR & WATER_SENS_PIN) > 0;
-		printf("Sensor value: %d, Water: %d\n\r", (int) sensor_val, water);
+		light_percentage = (sensor_val / 65536.0) * 100;
+
+		printf("Light level: %d (%2.2f%%)\n\r", (int) sensor_val, light_percentage);
 
 		if( sensor_val < 3000 ) {
 			// very little light has been detected
@@ -77,20 +75,38 @@ int main(void)
 
 		}
 
-		if( water )
-		{
-			// enable external LED (on pin 3)
-			GPIOE->BSRR = (1u << 3);
-		}
-		else
-		{
-			// disable external LED
-			GPIOE->BSRR = (1u << 19);
-		}
-
-		systick_delay_ms(1000);
+		systick_delay_ms(500);
 	}
 
-
 	systick_terminate();
+}
+
+static void exti_callback(void)
+{
+	// while water is deteced
+	printf("WATER DETECTED\n\r");
+	// turn off the lights
+	GPIOK->BSRR = (1u << 17);
+	while( (GPIOI->IDR & WATER_SENS_PIN) )
+	{
+		// enable external LED (on pin 3)
+		GPIOE->BSRR = (1u << 3);
+		systick_delay_ms(500);
+		// disable external LED
+		GPIOE->BSRR = (1u << 19);
+		systick_delay_ms(500);
+	}
+	printf("WATER CLEARED\n\r");
+}
+
+void EXTI9_5_IRQHandler(void)
+{
+	if( (EXTI->PR1 & LINE8) )
+	{
+		// Clear PR
+		EXTI->PR1 |= LINE8;
+
+		// Do something
+		exti_callback();
+	}
 }
