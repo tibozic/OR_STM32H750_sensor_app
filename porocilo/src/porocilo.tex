@@ -1,0 +1,139 @@
+\documentclass{article}
+
+%
+% packages
+%
+% references
+\usepackage[backend=biber]{biblatex}
+% better padding
+\usepackage[margin=100px]{geometry}
+% images
+\usepackage{graphicx}
+% math symbols
+\usepackage{amsmath}
+% more symbols
+\usepackage{textcomp}
+% more math symbols
+\usepackage{amssymb}
+% links
+\usepackage{hyperref}
+% linsk jump to top of figures
+\usepackage[all]{hypcap}
+% floating options ([H])
+\usepackage{float}
+% source code
+\usepackage{listings}
+% indent first paragraph after section
+\usepackage{indentfirst}
+% continous enumeration
+\usepackage{enumitem}
+% cmark and xmark
+\usepackage{pifont}
+% colors
+\usepackage[table,x11names]{xcolor}
+% column style
+\usepackage{tabu}
+% section settings
+\usepackage{titlesec}
+
+\addbibresource{~/scripts/latex/ref.bib}
+
+%
+% custom commands
+%
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\lxor}{\veebar}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+% path for images
+\graphicspath{{images/}}
+
+% link stuff
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=red,
+	runcolor=red,
+	urlcolor=cyan,
+	anchorcolor=black,
+	citecolor=.,
+	menucolor=red,
+	pdftitle={OR STM32H7 App Poro\v{c}ilo},
+}
+
+% Extra subsections (parargaph)
+\setcounter{secnumdepth}{4}
+
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+% programming stuff
+\lstset{language=Python}
+
+
+\author{}
+\title{OR STM32H7 App Poro\v{c}ilo}
+\date{2023}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\clearpage
+
+
+\section{Delovanje}
+\noindent
+Program deluje tako, da iz senzorja svetlobe (ki je priklopljen na pin
+A1) vsake 0.5 sekunde prebere vrednost. \v{C}e zazna premajhno
+koli\v{c}ino svetlobe pri\v{z}ge rumene lu\v{c}i (LED, ki so priklopljene
+na pin D4). Koli\v{c}ino svetlobe tudi sporo\v{c}i preko serjiske
+komunkacije. Tukaj je veliko mo\v{z}nosti za nadgradnjo z ne
+preve\v{c} dela, npr lahko bi senzor svetlobe postavili zunaj, LED pa
+bi iz digitalnega signala spremenili v analognega in bi imeli sistem
+za simulacijo zunanje svetlobe (lu\v{c}i se zjutraj zatemnijo, da
+simulirajo son\v{c}ni vzhod). Lahko pa bi namesto senzorja svetlobe
+priklopili senzor gibanja in bi imeli avtomatizirane lu\v{c}i. \\
+
+\noindent
+Program pa vsebuje tudi senzor teko\v{c}ine (priklopjen na D7), ki
+ob zaznanju teko\v{c}ine sprozi prekinitev, katera ugasne rumene
+lu\v{c}i in pri\v{z}ge ``alarm'' (utripanje modrih lu\v{c}i), ki je
+spro\v{z}en dokler senzor zaznava teko\v{c}ino. Preko serjiske
+komunikacije sporo\v{c}i, ko zazna teko\v{c}ino in ko jo neha
+zaznavati.
+
+\section{Vezje}
+\noindent
+Vezje je na sliki spodaj, le da je namesto senzorja vlage v tleh
+uporabljen sensor teko\v{c}ine.
+
+\begin{figure}[H]
+	\begin{center}
+	  \includegraphics[scale=0.6]{scheme.png}
+	\end{center}
+	\caption{Vezje}
+\end{figure}
+
+\section{Program}
+\noindent
+Programiral sem v programskem jeziku C, v CubeIDE. Uporabil sem
+header datoteke, ki jih izdaja ST
+(\href{https://www.st.com/en/embedded-software/stm32cubeh7.html}
+{https://www.st.com/en/embedded-software/stm32cubeh7.html}), nahajajo
+se v mapi chip\_headers. \\
+Svoj program se poskusal lo\v{c}iti na \v{c}im majn\v{s}e dele, ki
+spadajo skupaj (ADC, UART, SYSTICK, EXTI, FPU) in vsakega dal v svojo
+datotko. Celoten projekt je tudi objavlen na github:
+\href{https://github.com/tibozic/OR\_STM32H750\_sensor\_app}
+{https://github.com/tibozic/OR\_STM32H750\_sensor\_app}
+
+
+
+
+\end{document}

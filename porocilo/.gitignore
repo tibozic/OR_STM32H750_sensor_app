@@ -1,0 +1,4 @@
+src/*
+!src/*.tex
+!src/files/*
+!src/images/*
