@@ -30,7 +30,7 @@ int main(void)
 {
 	fpu_enable();
 
-	// connect clock to PD, PK
+	// connect clock to PE, PK
 	RCC->AHB4ENR |= (GPIOEEN | GPIOKEN);
 
 	// set PE3 (external water LED) to output mode (01)
@@ -84,6 +84,7 @@ static void exti_water_detected(void)
 {
 	// while water is deteced
 	printf("WATER DETECTED\n\r");
+
 	// turn off the lights
 	GPIOK->BSRR = (1u << 17);
 	while( (GPIOI->IDR & WATER_SENS_PIN) )
@@ -95,6 +96,7 @@ static void exti_water_detected(void)
 		GPIOE->BSRR = (1u << 19);
 		systick_delay_ms(500);
 	}
+
 	printf("WATER CLEARED\n\r");
 }
 
